@@ -1,0 +1,74 @@
+<div class="app-container">
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">{{ title() }}</h1>
+      <p class="app-subtitle">Real-time shipment tracking and delay prediction</p>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Error Alert -->
+    <div *ngIf="error()" class="alert alert-error">
+      <div class="alert-content">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text">{{ error() }}</span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading shipments...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && shipments().length === 0 && !error()" class="empty-state">
+      <p>No shipments found.</p>
+      <p class="text-muted">Create your first shipment to get started.</p>
+    </div>
+
+    <!-- Shipments Table -->
+    <div *ngIf="shipments().length > 0" class="table-section">
+      <h2>Active Shipments</h2>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Shipment ID</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Status</th>
+              <th>Est. Delivery</th>
+              <th>Delay Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let shipment of shipments()" [class.row-delayed]="shipment.delayPredicted">
+              <td class="cell-shipment-id">
+                <span class="badge">{{ shipment.shipmentId }}</span>
+              </td>
+              <td>{{ shipment.origin }}</td>
+              <td>{{ shipment.destination }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + shipment.status.toLowerCase()">
+                  {{ shipment.status }}
+                </span>
+              </td>
+              <td>{{ shipment.estimatedDelivery | date: 'MMM dd, yyyy' }}</td>
+              <td>
+                <span *ngIf="shipment.delayPredicted" class="risk-indicator risk-high">
+                  🚨 High Risk
+                </span>
+                <span *ngIf="!shipment.delayPredicted" class="risk-indicator risk-low">
+                  ✓ Low Risk
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<router-outlet></router-outlet>
